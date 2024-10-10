@@ -15,6 +15,6 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", columnDefinition = "ENUM('ADMIN', 'USER') DEFAULT 'USER'")
+    @Column(name = "role", columnDefinition = "ENUM('ADMIN', 'USER', 'SUPER_ADMIN') DEFAULT 'USER'")
     private RoleType role;
 }

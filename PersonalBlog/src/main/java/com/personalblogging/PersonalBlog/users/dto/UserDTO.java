@@ -12,6 +12,5 @@ import java.time.LocalDateTime;
 public class UserDTO {
     private String username;
     private String password;
-    private Long role;
     private LocalDateTime createdAt = LocalDateTime.now();
 }

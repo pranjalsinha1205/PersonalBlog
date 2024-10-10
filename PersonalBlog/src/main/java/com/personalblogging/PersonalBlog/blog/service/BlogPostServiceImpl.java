@@ -95,7 +95,7 @@ public class BlogPostServiceImpl implements BlogPostService{
 
         Optional<BlogPost> blogPostOptional = blogPostRepository.findById(id);
         if(!blogPostOptional.isPresent()){
-            responseModel.setMessage("Blog not found");
+            responseModel.setMessage("Blog with id " + id + " not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
         }
 
@@ -147,6 +147,18 @@ public class BlogPostServiceImpl implements BlogPostService{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
         }
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = null;
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            currentUsername = ((UserDetails) authentication.getPrincipal()).getUsername();
+        }
+
+        if (!currentUsername.equals(blogPost.get().getAuthor().getUsername())){
+            responseModel.setMessage("You can only delete your own posts!");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseModel);
+        }
+
         blogPostRepository.deleteById(id);
         responseModel.setMessage("Blog deleted successfully");
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -162,6 +174,18 @@ public class BlogPostServiceImpl implements BlogPostService{
             if (!blogPost.isPresent()) {
                 responseModel.setMessage("No blog with the id " + id + " found");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+            }
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentUsername = null;
+
+            if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+                currentUsername = ((UserDetails) authentication.getPrincipal()).getUsername();
+            }
+
+            if (!currentUsername.equals(blogPost.get().getAuthor().getUsername())){
+                responseModel.setMessage("You can only update your own posts!");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseModel);
             }
 
             BlogPost blogPost1 = blogPost.get();

@@ -10,4 +10,12 @@ public interface UserService {
     ResponseEntity<?> login(User user);
 
     ResponseEntity<?> registerUser(UserDTO userDTO);
+
+    ResponseEntity<?> deleteUser(long id);
+
+    ResponseEntity<?> getUsers();
+
+    ResponseEntity<?> getUserByUsername(String username);
+
+    ResponseEntity<?> registerAdmin(UserDTO userDTO);
 }

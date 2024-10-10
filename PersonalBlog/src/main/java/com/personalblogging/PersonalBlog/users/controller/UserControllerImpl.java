@@ -19,6 +19,11 @@ public class UserControllerImpl implements UserController{
     }
 
     @Override
+    public ResponseEntity<?> registerAdmin(UserDTO userDTO) {
+        return userService.registerAdmin(userDTO);
+    }
+
+    @Override
     public ResponseEntity<?> login(User user) {
         return userService.login(user);
     }
@@ -26,5 +31,20 @@ public class UserControllerImpl implements UserController{
     @Override
     public ResponseEntity<?> getUserProfile(long id) {
         return userService.getUserProfile(id);
+    }
+
+    @Override
+    public ResponseEntity<?> getUsers() {
+        return userService.getUsers();
+    }
+
+    @Override
+    public ResponseEntity<?> deleteUser(long id) {
+        return userService.deleteUser(id);
+    }
+
+    @Override
+    public ResponseEntity<?> getUserByUsername(String username) {
+        return userService.getUserByUsername(username);
     }
 }

@@ -14,9 +14,9 @@ public interface BlogController {
     @GetMapping
     ResponseEntity<?> getAllBlogs();
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     ResponseEntity<?> deleteBlog(@PathVariable Long id);
 
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     ResponseEntity<?> updateBlog(@PathVariable Long id, @RequestBody BlogPostDTO blogPostDTO);
 }
