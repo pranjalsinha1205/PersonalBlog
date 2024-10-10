@@ -95,7 +95,7 @@ public class BlogPostServiceImpl implements BlogPostService{
 
         Optional<BlogPost> blogPostOptional = blogPostRepository.findById(id);
         if(!blogPostOptional.isPresent()){
-            responseModel.setMessage("Blog not found");
+            responseModel.setMessage("Blog with id " + id + " not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
         }
 

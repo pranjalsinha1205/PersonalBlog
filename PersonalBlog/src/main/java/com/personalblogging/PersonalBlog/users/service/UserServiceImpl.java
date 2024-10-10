@@ -195,4 +195,27 @@ public class UserServiceImpl implements UserService{
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
     }
 
+    @Override
+    public ResponseEntity<?> getUserByUsername(String username) {
+        ResponseModel responseModel = new ResponseModel();
+
+        Optional<Object> userOptional = userRepository.findByUsernameIgnoreCase(username);
+        if (!userOptional.isPresent()){
+            responseModel.setMessage("No user with this username found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+        }
+
+        User user = (User) userOptional.get();
+
+        UserResponse responseDTO = new UserResponse();
+        responseDTO.setId(user.getId());
+        responseDTO.setUsername(user.getUsername());
+        responseDTO.setRole(user.getRole().getRole().name());
+        responseDTO.setCreatedAt(user.getCreatedAt());
+
+        responseModel.setMessage("User retrieved successfully");
+        responseModel.setData(responseDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+    }
 }

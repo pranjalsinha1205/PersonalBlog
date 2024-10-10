@@ -22,4 +22,7 @@ public interface UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable long id);
+
+    @GetMapping("/profile/name/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username);
 }

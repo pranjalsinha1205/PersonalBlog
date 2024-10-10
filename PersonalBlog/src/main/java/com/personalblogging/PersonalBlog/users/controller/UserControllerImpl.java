@@ -37,4 +37,9 @@ public class UserControllerImpl implements UserController{
     public ResponseEntity<?> deleteUser(long id) {
         return userService.deleteUser(id);
     }
+
+    @Override
+    public ResponseEntity<?> getUserByUsername(String username) {
+        return userService.getUserByUsername(username);
+    }
 }
