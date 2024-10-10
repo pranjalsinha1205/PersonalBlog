@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +76,7 @@ public class UserServiceImpl implements UserService{
 
             //user response
             UserResponse responseDTO = new UserResponse();
+            responseDTO.setId(savedUser.getId());
             responseDTO.setUsername(savedUser.getUsername());
             responseDTO.setRole(savedUser.getRole().getRole().name());
             responseDTO.setCreatedAt(savedUser.getCreatedAt());
@@ -144,6 +147,7 @@ public class UserServiceImpl implements UserService{
         User user1 = user.get();
 
         UserResponse responseDTO = new UserResponse();
+        responseDTO.setId(user1.getId());
         responseDTO.setUsername(user1.getUsername());
         responseDTO.setRole(user1.getRole().getRole().name());
         responseDTO.setCreatedAt(user1.getCreatedAt());
@@ -153,4 +157,42 @@ public class UserServiceImpl implements UserService{
 
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
     }
+
+    @Override
+    public ResponseEntity<?> deleteUser(long id) {
+        ResponseModel responseModel = new ResponseModel();
+
+        Optional<User> user = userRepository.findById(id);
+        if(!user.isPresent()){
+            responseModel.setMessage("No user with id " + id + " found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+        }
+
+        userRepository.deleteById(id);
+        responseModel.setMessage("User with id " + id + " has been successfully deleted");
+        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+    }
+
+    @Override
+    public ResponseEntity<?> getUsers() {
+        ResponseModel responseModel = new ResponseModel();
+
+        List<User> userList = userRepository.findAll();
+        if (userList.size() == 0){
+            responseModel.setMessage("No users in the database");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+        }
+        List<UserResponse> userResponses = userList.stream()
+                .map(users -> new UserResponse(
+                        users.getId(),
+                        users.getUsername(),
+                        users.getRole().getRole().name(),
+                        users.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+        responseModel.setMessage("Users list retrieved");
+        responseModel.setData(userResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+    }
+
 }

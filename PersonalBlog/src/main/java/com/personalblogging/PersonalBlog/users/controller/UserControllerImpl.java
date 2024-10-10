@@ -27,4 +27,14 @@ public class UserControllerImpl implements UserController{
     public ResponseEntity<?> getUserProfile(long id) {
         return userService.getUserProfile(id);
     }
+
+    @Override
+    public ResponseEntity<?> getUsers() {
+        return userService.getUsers();
+    }
+
+    @Override
+    public ResponseEntity<?> deleteUser(long id) {
+        return userService.deleteUser(id);
+    }
 }
