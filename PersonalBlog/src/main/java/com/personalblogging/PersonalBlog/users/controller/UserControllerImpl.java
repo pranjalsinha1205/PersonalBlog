@@ -19,6 +19,11 @@ public class UserControllerImpl implements UserController{
     }
 
     @Override
+    public ResponseEntity<?> registerAdmin(UserDTO userDTO) {
+        return userService.registerAdmin(userDTO);
+    }
+
+    @Override
     public ResponseEntity<?> login(User user) {
         return userService.login(user);
     }

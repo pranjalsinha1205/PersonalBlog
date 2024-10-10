@@ -16,4 +16,6 @@ public interface UserService {
     ResponseEntity<?> getUsers();
 
     ResponseEntity<?> getUserByUsername(String username);
+
+    ResponseEntity<?> registerAdmin(UserDTO userDTO);
 }

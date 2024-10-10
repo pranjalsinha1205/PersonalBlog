@@ -5,6 +5,7 @@ import com.personalblogging.PersonalBlog.jwt.JwtResponse;
 import com.personalblogging.PersonalBlog.response.ResponseModel;
 import com.personalblogging.PersonalBlog.response.UserResponse;
 import com.personalblogging.PersonalBlog.role.model.Role;
+import com.personalblogging.PersonalBlog.role.model.RoleType;
 import com.personalblogging.PersonalBlog.role.repository.RoleRepository;
 import com.personalblogging.PersonalBlog.users.dto.UserDTO;
 import com.personalblogging.PersonalBlog.users.model.User;
@@ -63,13 +64,21 @@ public class UserServiceImpl implements UserService{
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             user.setCreatedAt(userDTO.getCreatedAt());
 
-            Optional<Role> role = roleRepository.findById(userDTO.getRole());
-            if(role.isPresent()){
-                user.setRole(role.get());
-            }
-            else {
+//            if(role.isPresent()){
+//                user.setRole(role.get());
+//            }
+//            else {
+//                responseModel.setMessage("Role not found");
+//                return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+//            }
+
+            Optional<Role> defaultRole = roleRepository.findByRole(RoleType.USER);
+
+            if(defaultRole.isPresent()) {
+                user.setRole(defaultRole.get());
+            }else {
                 responseModel.setMessage("Role not found");
-                return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
             }
 
             User savedUser = userRepository.save(user);
@@ -217,5 +226,61 @@ public class UserServiceImpl implements UserService{
         responseModel.setData(responseDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<?> registerAdmin(UserDTO userDTO) {
+        ResponseModel responseModel = new ResponseModel();
+
+        try{
+            if (userDTO == null){
+                responseModel.setMessage("User data is missing");
+                return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+            }
+            if (ObjectUtils.isEmpty(userDTO.getUsername()) || ObjectUtils.isEmpty(userDTO.getPassword())) {
+                responseModel.setMessage("Required fields are missing");
+                return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+            }
+
+            if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+                responseModel.setMessage("Username already exists");
+                return new ResponseEntity<>(responseModel, HttpStatus.CONFLICT);
+            }
+
+            if (userRepository.findByUsernameIgnoreCase(userDTO.getUsername()).isPresent()) {
+                responseModel.setMessage("Username already exists");
+                return new ResponseEntity<>(responseModel, HttpStatus.CONFLICT);
+            }
+
+            User user = new User();
+            user.setUsername(userDTO.getUsername());
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            user.setCreatedAt(userDTO.getCreatedAt());
+            Optional<Role> defaultRole = roleRepository.findByRole(RoleType.ADMIN);
+
+            user.setRole(defaultRole.get());
+
+            User savedUser = userRepository.save(user);
+
+            //user response
+            UserResponse responseDTO = new UserResponse();
+            responseDTO.setId(savedUser.getId());
+            responseDTO.setUsername(savedUser.getUsername());
+            responseDTO.setRole(savedUser.getRole().getRole().name());
+            responseDTO.setCreatedAt(savedUser.getCreatedAt());
+
+            responseModel.setMessage("Admin created successfully");
+            responseModel.setData(responseDTO);
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+
+        }catch (IllegalArgumentException e) {
+            responseModel.setMessage("Invalid user type or role type");
+            return new ResponseEntity<>(responseModel, HttpStatus.BAD_REQUEST);
+        }catch (Exception e){
+            responseModel.setMessage("An error occured: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 }

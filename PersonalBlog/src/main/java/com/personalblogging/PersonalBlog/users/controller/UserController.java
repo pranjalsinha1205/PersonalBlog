@@ -10,6 +10,10 @@ public interface UserController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO);
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PostMapping("admin/register")
+    public ResponseEntity<?> registerAdmin(@RequestBody UserDTO userDTO);
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user);
 
